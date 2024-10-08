@@ -20,9 +20,6 @@ const MultiStepForm = () => {
         exit: { opacity: 0, y: -500 },
     };
 
-    // if (pollCompleted) {
-    //     return <Summery />;
-    // }
 
     const handleOptionSelect = (optionLabel) => {
         dispatch(selectOption({ stepIndex: currentStep, optionLabel }));
@@ -32,7 +29,7 @@ const MultiStepForm = () => {
         } else {
             setTimeout(() => {
                 dispatch(nextStep());
-            }, 500);
+            }, 100);
         }
     };
 
