@@ -1,13 +1,53 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import CustomButton from '../common/CustomButton';
+import { useMutation } from 'react-query';
+import toast, { Toaster } from 'react-hot-toast';
+import axios from 'axios';
+import { resetPoll } from '../redux/pollSlice';
 
 const SummaryScreen = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const selectedOptions = useSelector((state) => state.poll.selectedOptions);
     const steps = useSelector((state) => state.poll.steps);
-    const navigate = useNavigate();
+
+    const {
+        mutate,
+        isError,
+        isLoading,
+        isSuccess,
+    } = useMutation(
+        async (data) => {
+            const response = await axios.post('https://jsonplaceholder.typicode.com/posts', data);
+            return response;
+        }
+    );
+
+    const handleSubmit = () => {
+        const answers = steps.map((step, index) => ({
+            question: step.title,
+            answer: selectedOptions[index] ? selectedOptions[index] : 'Not answered',
+        }));
+
+        mutate({ answers });
+    };
+
+    const handlePollAgain = () => {
+        dispatch(resetPoll());
+        navigate('/');
+    };
+
+    useEffect(() => {
+        if (isSuccess) {
+            toast.success('Submission Successful!');
+        }
+        else if (isError) {
+            toast.error('Submission Failed!');
+        }
+    }, [isSuccess, isError]);
 
     const variants = {
         hidden: { opacity: 0, x: -500 },
@@ -16,34 +56,67 @@ const SummaryScreen = () => {
 
     return (
         <motion.div
-            className="flex flex-col items-center justify-center min-h-screen p-10 bg-purple-700"
+            className="flex flex-col items-center justify-center min-h-screen p-10 bg-purple-100"
             initial="hidden"
             animate="visible"
             variants={variants}
             transition={{ duration: 0.5 }}
         >
-            <h2 className="text-4xl font-bold mb-10 ">Your Answers</h2>
-            <div className="w-full max-w-3xl bg-white shadow-lg rounded-lg p-8">
-                <ul className="divide-y divide-gray-200">
+            <Toaster position="top-center" reverseOrder={false} />
+            <h2 className="text-4xl font-bold mb-10 text-purple-800">Your Answers</h2>
+
+            <div className="w-full max-w-3xl space-y-6">
+                <ul className="space-y-4">
                     {steps.map((step, index) => (
-                        <li key={index} className="py-4 flex justify-between items-center">
-                            <span className="text-xl font-medium text-gray-700">{step.title}</span>
-                            <span className="text-lg text-gray-500">
-                                {selectedOptions[index] ? selectedOptions[index] : 'Not answered'}
-                            </span>
+                        <li
+                            key={index}
+                            className="flex flex-row justify-between items-center -skew-x-12 shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 bg-white"
+                        >
+                            <div className="py-7 pl-8 pr-5 text-white w-[40rem] bg-pollPurple text-xl font-semibold transform ">
+                                <span className="">
+                                    {step.title}
+                                </span>
+                            </div>
+                            <div className="py-7 pr-8 text-gray-800 text-lg font-medium transform text-right w-[40rem]">
+                                <span className="flex items-center justify-end space-x-2">
+                                    <span className="mr-5 text-lg">
+                                        {/* Emoji here */}
+                                        {step.options.find(option => option.label === selectedOptions[index])?.icon}
+                                    </span>
+                                    <span>
+                                        {selectedOptions[index] ? selectedOptions[index] : 'Not answered'}
+                                    </span>
+                                </span>
+                            </div>
                         </li>
                     ))}
                 </ul>
             </div>
 
-            <div className="mt-10">
-                <CustomButton
-                    text="Back to Poll"
-                    bgColor="bg-purple-600"
-                    textColor="text-white"
-                    onClick={() => navigate('/')}
-                />
+            {isLoading && <p className="text-purple-700 mt-4 font-bold">Submitting...</p>}
+
+            <div className='flex flex-row content-center align-baseline mt-10'>
+                <div>
+                    <CustomButton
+                        text="Submit"
+                        buttonColor="bg-violet-600"
+                        textColor="text-white"
+                        rounded="rounded-md"
+                        onClick={handleSubmit}
+                    />
+                </div>
+                <div className='ml-5'>
+                    <CustomButton
+                        text="Poll Again"
+                        buttonColor="bg-gray-500"
+                        textColor="text-white"
+                        rounded="rounded-md"
+                        onClick={handlePollAgain}
+                    />
+                </div>
             </div>
+
+
         </motion.div>
     );
 };

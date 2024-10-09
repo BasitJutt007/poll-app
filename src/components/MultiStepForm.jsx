@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { nextStep, selectOption } from '../redux/pollSlice';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import Summery from './Summery';
 import Dots from '../common/Dots';
 
 const MultiStepForm = () => {
@@ -29,7 +28,7 @@ const MultiStepForm = () => {
         } else {
             setTimeout(() => {
                 dispatch(nextStep());
-            }, 100);
+            }, 200);
         }
     };
 
@@ -70,15 +69,19 @@ const MultiStepForm = () => {
                                 key={index}
                                 className="relative text-6xl cursor-pointer px-5"
                                 whileHover={{ scale: 1.2 }}
+                                onClick={() => {
+                                    setHoveredIndex(index);
+                                    handleOptionSelect(option.label);
+                                }}
                                 onHoverStart={() => setHoveredIndex(index)}
                                 onHoverEnd={() => setHoveredIndex(null)}
-                                onClick={() => handleOptionSelect(option.label)}
                             >
 
                                 <span className="emoji">{option.icon}</span>
 
                                 <motion.span
-                                    className="absolute left-1/2 transform -translate-x-1/2 mt-16 text-lg font-bold pointer-events-none"
+                                    className={`absolute left-1/2 transform -translate-x-1/2 mt-16 text-lg font-bold 
+                                                ${selectedOptions[currentStep] === option.label ? 'text-purple-600' : 'text-gray-700'}`}
                                     initial={{ opacity: 0 }}
                                     animate={{ opacity: hoveredIndex === index ? 1 : 0 }}
                                     transition={{ duration: 0.2 }}

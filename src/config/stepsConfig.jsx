@@ -16,30 +16,6 @@ export const steps = [
         ],
     },
     {
-        title: "Favorite Animal?",
-        options: [
-            { label: "Cat", icon: "🐱" },
-            { label: "Dog", icon: "🐶" },
-            { label: "Bird", icon: "🐦" },
-        ],
-    },
-    {
-        title: "Favorite Color?",
-        options: [
-            { label: "Red", icon: "🔴" },
-            { label: "Green", icon: "🟢" },
-            { label: "Blue", icon: "🔵" },
-        ],
-    },
-    {
-        title: "Favorite Season?",
-        options: [
-            { label: "Summer", icon: "🌞" },
-            { label: "Winter", icon: "⛄" },
-            { label: "Spring", icon: "🌸" },
-        ],
-    },
-    {
         title: "Favorite Food?",
         options: [
             { label: "Pizza", icon: "🍕" },

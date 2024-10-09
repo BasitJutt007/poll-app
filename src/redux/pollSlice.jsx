@@ -25,9 +25,14 @@ const pollSlice = createSlice({
             const { stepIndex, optionLabel } = action.payload;
             state.selectedOptions[stepIndex] = optionLabel;
         },
+        resetPoll: (state) => {
+            state.currentStep = 0;
+            state.selectedOptions = {};
+        }
+
     },
 });
 
-export const { nextStep, prevStep, selectOption } = pollSlice.actions;
+export const { nextStep, prevStep, selectOption, resetPoll } = pollSlice.actions;
 
 export default pollSlice.reducer;

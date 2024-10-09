@@ -9,12 +9,11 @@ export default {
       screens: {
         "medium-screen": { max: "1120px" },
         "small-screen": { max: "768px" },
+      },
+      colors: {
+        pollPurple: '#6b54fe',  // Your custom color
       }
     },
-    colors: {
-      pollPurple: '#6b54fe'
-    }
   },
   plugins: [],
 }
-
