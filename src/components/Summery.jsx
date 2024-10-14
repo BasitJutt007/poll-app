@@ -1,53 +1,50 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { motion } from 'framer-motion';
 import CustomButton from '../common/CustomButton';
-import { useMutation } from 'react-query';
 import toast, { Toaster } from 'react-hot-toast';
-import axios from 'axios';
 import { resetPoll } from '../redux/pollSlice';
+import { useSubmitPollMutation } from '../redux/pollApi';
 
 const SummaryScreen = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const selectedOptions = useSelector((state) => state.poll.selectedOptions);
     const steps = useSelector((state) => state.poll.steps);
+    const [submitPoll, { isError, isLoading, isSuccess }] = useSubmitPollMutation();
 
-    const {
-        mutate,
-        isError,
-        isLoading,
-        isSuccess,
-    } = useMutation(
-        async (data) => {
-            const response = await axios.post('https://jsonplaceholder.typicode.com/posts', data);
-            return response;
-        }
-    );
+
 
     const handleSubmit = () => {
         const answers = steps.map((step, index) => ({
             question: step.title,
             answer: selectedOptions[index] ? selectedOptions[index] : 'Not answered',
         }));
+        console.log("Sending This:::", answers)
 
-        mutate({ answers });
+        toast.promise(
+            submitPoll(answers).unwrap(),
+            {
+                loading: 'Submitting your poll...',
+                success: <b>Poll submitted successfully!</b>,
+                error: <b>Submission failed!</b>,
+            }
+        ).then(() => {
+            setTimeout(() => {
+                navigate('/result');
+            }, 700)
+        }).catch((err) => {
+            console.error("Submission failed due to error:", err);
+        });
     };
+
+
 
     const handlePollAgain = () => {
         dispatch(resetPoll());
         navigate('/');
     };
-
-    useEffect(() => {
-        if (isSuccess) {
-            toast.success('Submission Successful!');
-        }
-        else if (isError) {
-            toast.error('Submission Failed!');
-        }
-    }, [isSuccess, isError]);
 
     const variants = {
         hidden: { opacity: 0, x: -500 },
@@ -93,7 +90,6 @@ const SummaryScreen = () => {
                 </ul>
             </div>
 
-            {isLoading && <p className="text-purple-700 mt-4 font-bold">Submitting...</p>}
 
             <div className='flex flex-row content-center align-baseline mt-10'>
                 <div>
@@ -108,7 +104,7 @@ const SummaryScreen = () => {
                 <div className='ml-5'>
                     <CustomButton
                         text="Poll Again"
-                        buttonColor="bg-gray-500"
+                        buttonColor="bg-green-500"
                         textColor="text-white"
                         rounded="rounded-md"
                         onClick={handlePollAgain}
